@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // 向用户解释为什么需要这个权限
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)) {
                 new AlertDialog.Builder(this)
-                        .setMessage("申请相机权限")
+                        .setMessage("申请录音权限")
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         new String[]{Manifest.permission.RECORD_AUDIO}, CAMERA_REQUEST_CODE);
             }
         } else {
-            Toast.makeText(this, "相机权限已申请", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "录音权限已申请", Toast.LENGTH_SHORT).show();
         }
     }
     //权限申请结果
@@ -126,13 +126,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_REQUEST_CODE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "相机权限已申请", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "录音权限已申请", Toast.LENGTH_SHORT).show();
 
             } else {
                 //用户勾选了不再询问
                 //提示用户手动打开权限
                 if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-                    Toast.makeText(this, "相机权限已被禁止", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "录音权限已被禁止", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            Log.d("Result=======",result);
             tv.setText(result);
             //获取焦点
-//            tv.requestFocus();
+            tv.requestFocus();
             //将光标定位到文字最后，以便修改
             tv.setSelection(result.length());
         }
