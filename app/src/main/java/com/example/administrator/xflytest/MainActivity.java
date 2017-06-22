@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.media.MediaCodec;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -18,18 +17,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.administrator.xflytest.tranlate.HttpGet;
-import com.example.administrator.xflytest.tranlate.TransApi;
+import com.example.administrator.xflytest.xfly.JsonParser;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
 import com.iflytek.cloud.RecognizerResult;
-import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.SpeechRecognizer;
 import com.iflytek.cloud.ui.RecognizerDialog;
 import com.iflytek.cloud.ui.RecognizerDialogListener;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
@@ -155,9 +149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         @Override
         public void onResult(RecognizerResult recognizerResult, boolean b) {
-
             String resultJson = recognizerResult.getResultString();
-//            Log.d("Result=======",resultJson);
             //b=true 表示会话完成
             String result = null;
             if (!b){

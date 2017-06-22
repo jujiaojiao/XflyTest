@@ -1,11 +1,13 @@
-package com.example.administrator.xflytest;
+package com.example.administrator.xflytest.xfly;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 /**
- * Created by Administrator on 2017/6/21.
+ *
+ *      讯飞的json解析类
+ *
  */
 
 public class JsonParser {
