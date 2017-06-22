@@ -112,7 +112,7 @@ public class HttpGet {
 	        }.execute();
 	    }
 	public static  void onTranslate(String needToTranslate,final TextView view){
-			String to = "en";
+			String to = "";
 			if(isChinese(needToTranslate)){
 				to = "en";
 			}else {

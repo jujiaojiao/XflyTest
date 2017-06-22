@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private final int CAMERA_REQUEST_CODE = 1;
     private Button say;
     private EditText tv;
-    public static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 String resultString = recognizerResult.getResultString();
                 if (!b){
                     String result = JsonParser.parseIatResult(resultString);
-                    Log.e(TAG, "onResult: "+result);
                     HttpGet.onTranslate(result,tv);
                 }
             }
