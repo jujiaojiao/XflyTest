@@ -9,6 +9,8 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,17 +23,17 @@ import android.widget.TextView;
 
 //只需传入需要翻译的原文，译文的语言，以及展示译文的textview
 public class HttpGet {
-		private  static final String UTF8 = "utf-8";
-	    //APP ID
-	    private static final  String APP_ID = "20170608000055594";
-	    //Key
-	    private  static final String SECRET_KEY = "ukqWZefsxqfHM2AI5u1v";
-	    //翻译HTTP地址：
-	    private  static final String baseURL = "http://api.fanyi.baidu.com/api/trans/vip/translate";
-	    //随机数
-	    private  static final Random random = new Random();
-	    private  static final String from = "auto";
-	    private static void translate( String needToTransString, String to, final TransApi callBack) throws Exception {
+	private  static final String UTF8 = "utf-8";
+	//APP ID
+	private static final  String APP_ID = "20170608000055594";
+	//Key
+	private  static final String SECRET_KEY = "ukqWZefsxqfHM2AI5u1v";
+	//翻译HTTP地址：
+	private  static final String baseURL = "http://api.fanyi.baidu.com/api/trans/vip/translate";
+	//随机数
+	private  static final Random random = new Random();
+	private  static final String from = "auto";
+	private static void translate( String needToTransString, String to, final TransApi callBack) throws Exception {
 	        //生成签名sign
 	        int salt = random.nextInt(10000);
 	        //appid+needToTransString+salt+密钥
@@ -41,8 +43,8 @@ public class HttpGet {
 	        final URL urlFinal = new URL(baseURL + "?q=" + URLEncoder.encode(needToTransString, UTF8) +
 	                "&from=" + from + "&to=" + to + "&appid=" + APP_ID + "&salt=" + salt + "&sign=" + sign);
 	       URLEncoder.encode(needToTransString, UTF8);//%E4%BD%A0%E5%A5%BD
-
-	        //异步任务访问网络
+			Log.i("JJJ============URLFinal", "translate: "+urlFinal);
+			//异步任务访问网络
 	        new AsyncTask<Void, Integer, String>() {
 	            @Override
 	            protected String doInBackground(Void... params) {
@@ -61,7 +63,7 @@ public class HttpGet {
 	                    StringBuilder builder = new StringBuilder();
 	                    while ((line = br.readLine()) != null) {
 	                        builder.append(line).append("\n");
-	                    }
+						}
 	                    //关闭输入流
 	                    br.close();
 	                    isr.close();
@@ -109,13 +111,21 @@ public class HttpGet {
 	            }
 	        }.execute();
 	    }
-	  	public static  void onTranslate(String needToTranslate,String to ,final TextView view){
+	public static  void onTranslate(String needToTranslate,final TextView view){
+			String to = "en";
+			if(isChinese(needToTranslate)){
+				to = "en";
+			}else {
+				to = "zh";
+			}
+			Log.e("JJJ", "====to===="+to);
 			try {
 				translate(needToTranslate, to, new TransApi() {
                     @Override
                     public void onSuccess(String result) {
                         view.setText(result);
-                    }
+						Log.e("JJJ===============", "onSuccess: "+result);
+					}
 
                     @Override
                     public void onFailure(String exception) {
@@ -126,5 +136,27 @@ public class HttpGet {
 				e.printStackTrace();
 			}
 		}
+	// 完整的判断中文汉字和符号
+    private static boolean isChinese(String strName) {
+        char[] ch = strName.toCharArray();
+        for (int i = 0; i < ch.length; i++) {
+            char chr = ch[i];
+            if (isChinese(chr)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // 根据Unicode编码完美的判断中文汉字和符号
+    private static boolean isChinese(char c) {
+        Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+        if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+                || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+                || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION || ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+                || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+            return true;
+        }
+        return false;
+    }
 }
 

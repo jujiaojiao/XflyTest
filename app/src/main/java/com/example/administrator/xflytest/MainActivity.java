@@ -4,12 +4,14 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.media.MediaCodec;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,12 +28,14 @@ import com.iflytek.cloud.SpeechRecognizer;
 import com.iflytek.cloud.ui.RecognizerDialog;
 import com.iflytek.cloud.ui.RecognizerDialogListener;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
     private final int CAMERA_REQUEST_CODE = 1;
     private Button say;
     private EditText tv;
-    private static final String to = "en";//译文的语言
     public static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +111,8 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 String resultString = recognizerResult.getResultString();
                 if (!b){
                     String result = JsonParser.parseIatResult(resultString);
-                    HttpGet.onTranslate(result,to,tv);
+                    Log.e(TAG, "onResult: "+result);
+                    HttpGet.onTranslate(result,tv);
                 }
             }
 
@@ -158,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             if (!b){
                 result = JsonParser.parseIatResult(resultJson);
             }
-            HttpGet.onTranslate(result,to,tv);
+            HttpGet.onTranslate(result,tv);
         }
 
         @Override
@@ -173,4 +178,5 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
 
         }
     };
+
 }
