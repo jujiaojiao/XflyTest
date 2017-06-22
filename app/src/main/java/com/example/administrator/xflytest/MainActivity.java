@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RecognizerDialog iatDialog;
     private Button say;
     private EditText tv;
+    private String translateText;
     public static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,18 +144,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         requestPermission();
         //1.创建SpeechRecognizer对象，第二个参数：本地听写时传InitListener
         SpeechRecognizer mIat= SpeechRecognizer.createRecognizer(this, null);
+        RecognizerDialog dialog = new RecognizerDialog(this, new InitListener() {
+            @Override
+            public void onInit(int i) {
+
+            }
+        });
+        dialog.setListener(new RecognizerDialogListener() {
+            @Override
+            public void onResult(RecognizerResult recognizerResult, boolean b) {
+                String resultString = recognizerResult.getResultString();
+                if (!b){
+                    String result = JsonParser.parseIatResult(resultString);
+                    translate(result);
+                }
+            }
+
+            @Override
+            public void onError(SpeechError speechError) {
+
+            }
+        });
+        dialog.show();
         //2.设置听写参数，详见《科大讯飞MSC API手册(Android)》SpeechConstant类
-        mIat.setParameter(SpeechConstant.DOMAIN, "iat");
-        mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
-        mIat.setParameter(SpeechConstant.ACCENT, "mandarin ");
-        //3.开始听写
-        mIat.startListening(mRecoListener);
+//        mIat.setParameter(SpeechConstant.DOMAIN, "iat");
+//        mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+//        mIat.setParameter(SpeechConstant.ACCENT, "mandarin ");
+//        //3.开始听写
+//        mIat.startListening(mRecoListener);
         //听写监听器
 
 
 
         return false;
     }
+    private static final String to = "en";
     private RecognizerListener mRecoListener = new RecognizerListener() {
         //听写结果回调接口(返回Json格式结果，用户可参见附录12.1)；
         //一般情况下会通过onResults接口多次返回结果，完整的识别内容是多次结果的累加；
@@ -179,14 +203,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onResult(RecognizerResult recognizerResult, boolean b) {
 
             String resultJson = recognizerResult.getResultString();
-            Log.d("Result=======",resultJson);
-            String result = JsonParser.parseIatResult(resultJson);
-//            Log.d("Result=======",result);
-            tv.setText(result);
-            //获取焦点
-            tv.requestFocus();
-            //将光标定位到文字最后，以便修改
-            tv.setSelection(result.length());
+//            Log.d("Result=======",resultJson);
+            if (!b){
+                String result = JsonParser.parseIatResult(resultJson);
+//                Log.d("text=======",result);
+                tv.setText(result);
+                //获取焦点
+                tv.requestFocus();
+                //将光标定位到文字最后，以便修改
+                tv.setSelection(result.length());
+            }
         }
 
         @Override
@@ -201,5 +227,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     };
+    private void translate(String str){
+        HttpGet httpGet = new HttpGet();
+        try {
+            httpGet.translate(str, to, new TransApi() {
+                @Override
+                public void onSuccess(String result) {
+                    tv.setText(result);
+                    //获取焦点
+                    tv.requestFocus();
+                    //将光标定位到文字最后，以便修改
+                    tv.setSelection(result.length());
+                }
 
+                @Override
+                public void onFailure(String exception) {
+
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
