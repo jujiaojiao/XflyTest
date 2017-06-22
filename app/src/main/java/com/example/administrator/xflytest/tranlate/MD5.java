@@ -1,4 +1,4 @@
-package com.example.administrator.xflytest;
+package com.example.administrator.xflytest.tranlate;
 
 import java.security.MessageDigest;
 

@@ -1,4 +1,4 @@
-package com.example.administrator.xflytest;
+package com.example.administrator.xflytest.tranlate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,9 +17,10 @@ import org.json.JSONObject;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
-//只需传入需要翻译的原文，译文的语言，以及接口
+import android.widget.TextView;
+
+//只需传入需要翻译的原文，译文的语言，以及展示译文的textview
 public class HttpGet {
-		private static HttpGet httpget=null; 
 		private  static final String UTF8 = "utf-8";
 	    //APP ID
 	    private static final  String APP_ID = "20170608000055594";
@@ -30,12 +31,7 @@ public class HttpGet {
 	    //随机数
 	    private  static final Random random = new Random();
 	    private  static final String from = "auto";
-
-	    public  HttpGet() {
-
-	    }
-
-	    public void translate( String needToTransString, String to, final TransApi callBack) throws Exception {
+	    private static void translate( String needToTransString, String to, final TransApi callBack) throws Exception {
 	        //生成签名sign
 	        int salt = random.nextInt(10000);
 	        //appid+needToTransString+salt+密钥
@@ -113,8 +109,22 @@ public class HttpGet {
 	            }
 	        }.execute();
 	    }
-	    public void ontranslate(View view){
-	    	
-	    }
+	  	public static  void onTranslate(String needToTranslate,String to ,final TextView view){
+			try {
+				translate(needToTranslate, to, new TransApi() {
+                    @Override
+                    public void onSuccess(String result) {
+                        view.setText(result);
+                    }
+
+                    @Override
+                    public void onFailure(String exception) {
+
+                    }
+                });
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 }
 
