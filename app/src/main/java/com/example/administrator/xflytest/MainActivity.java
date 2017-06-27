@@ -2,9 +2,15 @@ package com.example.administrator.xflytest;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -25,22 +31,46 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.ui.RecognizerDialog;
 import com.iflytek.cloud.ui.RecognizerDialogListener;
 
+import java.io.InputStream;
+import java.util.UUID;
+
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
     private final int CAMERA_REQUEST_CODE = 1;
     private Button say;
     private EditText tv;
+    private BluetoothAdapter mBluetoothAdapter;
+    private AcceptThread acceptThread;
+    // 和客户端相同的UUID
+    private final UUID MY_UUID = UUID.fromString("abcd1234-ab12-ab12-ab12-abcdef123456");
+    private final String NAME = "Bluetooth_Socket";
+    private BluetoothServerSocket serverSocket;
+    private BluetoothSocket socket;
+    private InputStream is;//
+    private Handler     handler = new Handler() {
+        public void handleMessage(Message msg) {
+            Toast.makeText(getApplicationContext(), String.valueOf(msg.obj),
+                    Toast.LENGTH_LONG).show();
+            super.handleMessage(msg);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
     }
+
+
     //控件初始化操作
     public void initView(){
         say = ((Button) findViewById(R.id.btn));
         tv = ((EditText) findViewById(R.id.textView));
         say.setOnLongClickListener(this);
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        acceptThread = new AcceptThread();
+        acceptThread.start();
     }
     //动态申请权限
     @TargetApi(Build.VERSION_CODES.M)
@@ -169,4 +199,36 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
     };
 
+    private class AcceptThread extends Thread {
+        public void run() {
+            try {
+                serverSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            Log.d(tag, "等待客户连接...");
+            while (true) {
+                try {
+                    BluetoothSocket socket = serverSocket.accept();
+                    BluetoothDevice device = socket.getRemoteDevice();
+//                    Log.d(tag, "接受客户连接 , 远端设备名字:" + device.getName() + " , 远端设备地址:" + device.getAddress());
+                    byte[] buffer = new byte[64];
+                    if (socket.isConnected()) {
+//                        Log.d(tag, "已建立与客户连接.");
+                        InputStream is = socket.getInputStream();
+                        int cnt = is.read(buffer);
+                        is.close();
+                        Message msg = new Message();
+                        msg.obj = new String(buffer, 0, cnt, "utf-8");
+                        Log.e("JJJ========", "run: "+msg.obj);
+                        handler.sendMessage(msg);
+//                        Log.d(tag, "收到服务端发来数据:" + s);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }
