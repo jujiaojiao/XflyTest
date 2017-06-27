@@ -45,12 +45,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     private final UUID MY_UUID = UUID.fromString("abcd1234-ab12-ab12-ab12-abcdef123456");
     private final String NAME = "Bluetooth_Socket";
     private BluetoothServerSocket serverSocket;
-    private BluetoothSocket socket;
-    private InputStream is;//
-    private Handler     handler = new Handler() {
+    private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
-            Toast.makeText(getApplicationContext(), String.valueOf(msg.obj),
-                    Toast.LENGTH_LONG).show();
+            recognize();
             super.handleMessage(msg);
         }
     };
@@ -118,7 +115,22 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     @Override
     public boolean onLongClick(View v) {
         requestPermission();
-//==================================显示对话框=========================================
+        //==================================显示对话框=========================================
+        recognize();
+        //===================不显示对话框==================================
+     /*   //1.创建SpeechRecognizer对象，第二个参数：本地听写时传InitListener
+        SpeechRecognizer mIat= SpeechRecognizer.createRecognizer(this, null);
+        //2.设置听写参数，详见《科大讯飞MSC API手册(Android)》SpeechConstant类
+        mIat.setParameter(SpeechConstant.DOMAIN, "iat");
+        mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+        mIat.setParameter(SpeechConstant.ACCENT, "mandarin ");
+        //3.开始听写
+        mIat.startListening(mRecoListener);*/
+
+
+        return false;
+    }
+    private void recognize(){
         RecognizerDialog dialog = new RecognizerDialog(this, new InitListener() {
             @Override
             public void onInit(int i) {
@@ -141,19 +153,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         });
         dialog.show();
-
-        //===================不显示对话框==================================
-     /*   //1.创建SpeechRecognizer对象，第二个参数：本地听写时传InitListener
-        SpeechRecognizer mIat= SpeechRecognizer.createRecognizer(this, null);
-        //2.设置听写参数，详见《科大讯飞MSC API手册(Android)》SpeechConstant类
-        mIat.setParameter(SpeechConstant.DOMAIN, "iat");
-        mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
-        mIat.setParameter(SpeechConstant.ACCENT, "mandarin ");
-        //3.开始听写
-        mIat.startListening(mRecoListener);*/
-
-
-        return false;
     }
     //不显示对话框的听写监听器
     private RecognizerListener mRecoListener = new RecognizerListener() {
@@ -219,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                         int cnt = is.read(buffer);
                         is.close();
                         Message msg = new Message();
+//                        msg.what =cnt;
                         msg.obj = new String(buffer, 0, cnt, "utf-8");
                         Log.e("JJJ========", "run: "+msg.obj);
                         handler.sendMessage(msg);
