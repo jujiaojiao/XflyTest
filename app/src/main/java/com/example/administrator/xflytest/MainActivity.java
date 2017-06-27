@@ -54,15 +54,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             super.handleMessage(msg);
         }
     };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
     }
-
-
     //控件初始化操作
     public void initView(){
         say = ((Button) findViewById(R.id.btn));
@@ -199,6 +196,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
     };
 
+    /**
+     * 接收线程
+     */
     private class AcceptThread extends Thread {
         public void run() {
             try {
